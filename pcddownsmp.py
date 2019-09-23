@@ -99,7 +99,9 @@ dataarr2 = dataarr2.reshape(int(nwid),nhei)
 dataarr2 = dataarr2[:,0]
 points /= 100
 resizedata = dataarr2.reshape(int(points))
-
+wid = int(nwid)
+hei = int(nhei)
+points = int(points)
 array[6] = 'WIDTH ' + str(wid)
 array[7] = 'HEIGHT ' + str(hei)
 array[9] = 'POINTS ' + str(points)
