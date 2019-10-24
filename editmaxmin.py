@@ -32,12 +32,14 @@ print(maxhist)
 mode = maxhist.argmax()
 print(mode)
 
-sleepline = mode * 0.002 + 0.005
+sleepline = mode * 0.002
 print(sleepline)
 
 overline = df.query('avgmax3 > ' + str(sleepline))
-overline15 = df.query('avgmax3 > ' + str(sleepline*15))
+overline15 = df.query('avgmax3 > ' + str(sleepline+0.1))
 print(overline)
+print('overline15')
+print(overline15)
 
 y = overline['year'].size
 startid = np.array([0]*y)
@@ -73,7 +75,7 @@ a = startid2.size
 start = 0
 
 for i in range(a-1):
-    if(startid2[i+1]-startid2[i]-numarr2[i]+1>60):
+    if(startid2[i+1]-startid2[i]-numarr2[i]+1>20):
         sleepid = startid2[i]+numarr2[i]
         print('sleepid:',sleepid)
         print(df.loc[sleepid])
@@ -83,29 +85,34 @@ for i in range(a-1):
 
 overline15 = overline15.query('id > ' + str(sleepid))
 y = overline15['year'].size
+print('y: ',y)
 startid15 = np.array([0]*y)
 numarr15 = np.array([0]*y)
 overid15 = overline15.index.values
 flag = False
 k = 0
 
-for i in range(y-1):
-    if(flag==False):
-        startid15[k] = overid15[i]
-        if(overid15[i]+1 == overid15[i+1]):
-            flag = True
+if(y>1):
+    for i in range(y-1):
+        if(flag==False):
+            startid15[k] = overid15[i]
+            if(overid15[i]+1 == overid15[i+1]):
+                flag = True
             
-            numarr15[k] += 1
+                numarr15[k] += 1
+            else:
+                numarr15[k] += 1
+                k += 1
         else:
-            numarr15[k] += 1
-            k += 1
-    else:
-        if(overid15[i]+1 == overid15[i+1]):
-            numarr15[k] += 1
-        else:
-            flag = False
-            numarr15[k] += 1
-            k += 1
+            if(overid15[i]+1 == overid15[i+1]):
+                numarr15[k] += 1
+            else:
+                flag = False
+                numarr15[k] += 1
+                k += 1
+else:
+    startid15[0] = overid15[0]
+    numarr15[0] = 1
 
 startid152 = np.trim_zeros(startid15,trim='b')
 numarr152 = np.trim_zeros(numarr15, trim='b')
