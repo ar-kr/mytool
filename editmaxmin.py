@@ -11,6 +11,40 @@ def datedif(idx,listx,idy,listy):
         dif += 24 * 3600
     return dif
 
+def avg10(maxnorm, center,df):
+    sum = 0
+    num = 0
+    len = maxnorm.size
+    if(center > 1):
+        for i in range(center-1,0,-1):
+            dif = datedif(i+1,df,center+1,df)
+            if(dif<=300):
+                sum += maxnorm[i+1]
+                num += 1
+    elif(center == 1):
+        dif = datedif(1,df,center+1,df)
+        if(dif<=300):
+            sum += maxnorm[1]
+            num += 1
+    if(center!=len):
+        for i in range(center,len):
+            dif = datedif(center+1,df,i+1,df)
+            if(dif<=300):
+                sum += maxnorm[i+1]
+                num += 1
+    elif(center==len):
+        sum += maxnorm[len]
+        num += 1
+    return sum/num
+
+def makeavg60(df):
+    maxnorm = df['maxnorm']
+    size = df.size
+    avgmax = np.array([0]*size)
+    for i in range(size):
+        avgmax[i] = avg10(maxnorm,i,df)
+    return avgmax
+
 fname = input('filename: ')
 df = pd.read_csv(fname, index_col=0)
 # print(df)
@@ -167,6 +201,8 @@ sleepminutes = ((sleepsum-sleepseconds)/60)%60
 midminutes = ((midtimesum-midseconds)/60)%60
 sleephour = (sleepsum-(sleepsum%3600))/3600
 midhour = (midtimesum-(midtimesum%3600))/3600
+
+print('makeavg: ',makeavg60(df))
 
 print('**********')
 print('sleep:',int(sleeptime[0]),int(sleeptime[1]),int(sleeptime[2]),' ',int(sleeptime[3]),int(sleeptime[4]),int(sleeptime[5]))
