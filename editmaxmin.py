@@ -1,26 +1,36 @@
 import pandas as pd
 import numpy as np
 
+def datedif(idx,listx,idy,listy):
+    y = listy.loc[idy].values
+    secy = y[3] * 3600 + y[4] * 60 + y[5]
+    x = listx.loc[idx].values
+    secx = x[3] * 3600 + x[4] * 60 + x[5]
+    dif = secy - secx
+    if(dif<0):
+        dif += 24 * 3600
+    return dif
+
 fname = input('filename: ')
 df = pd.read_csv(fname, index_col=0)
 # print(df)
 
 avgmax3 = df['avgmax3']
-print(avgmax3)
+#print(avgmax3)
 
 #maxnorm = df['maxnorm']
 maxnorm = df.query('maxnorm <= 0.1')
-print(maxnorm)
+#print(maxnorm)
 
 
 #maxhist = maxnorm['maxnorm'].value_counts(sort = False, bins = 100)
 #print(maxhist)
 
 maxnormarr = maxnorm['maxnorm'].values
-print(maxnormarr)
+#print(maxnormarr)
 maxnormarr = (maxnormarr * 1000)
 
-print(maxnormarr)
+#print(maxnormarr)
 maxhist = np.array([0]*100)
 x = maxnormarr.size
 
@@ -35,11 +45,11 @@ print(mode)
 sleepline = mode * 0.002
 print(sleepline)
 
-overline = df.query('avgmax3 > ' + str(sleepline))
+overline = df.query('avgmax3 > ' + str(sleepline+0.005))
 overline15 = df.query('avgmax3 > ' + str(sleepline+0.1))
-print(overline)
+#print(overline)
 print('overline15')
-print(overline15)
+#print(overline15)
 
 y = overline['year'].size
 startid = np.array([0]*y)
@@ -75,13 +85,16 @@ a = startid2.size
 start = 0
 
 for i in range(a-1):
-    if(startid2[i+1]-startid2[i]-numarr2[i]+1>20):
+    dif = datedif(startid2[i]+numarr2[i],df,startid2[i+1],df)
+    if(dif > 600):
         sleepid = startid2[i]+numarr2[i]
         print('sleepid:',sleepid)
         print(df.loc[sleepid])
         sleeptime = df.loc[sleepid].values
         start = i+1
         break
+    else:
+        print('i,dif: ',i,dif)
 
 overline15 = overline15.query('id > ' + str(sleepid))
 y = overline15['year'].size
@@ -127,7 +140,7 @@ waketime = overline15.loc[startid15[a-1]].values
 end = a-1
 
 midtimesum = 0
-for i in range(a):
+for i in range(end):
     if(numarr15[i]>=3):
         print('mid:',startid15[i])
         print(overline15.loc[startid15[i]])
@@ -161,4 +174,4 @@ print('wake:',int(waketime[0]),int(waketime[1]),int(waketime[2]),' ',int(waketim
 print('----------')
 print(sleephour,':',sleepminutes,'.',sleepseconds)
 print(midhour,':',midminutes,'.',midseconds)
-            
+
